@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Model Viewer with Surface Detection</title>
+ 
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
+        /* Стили для model-viewer */
         model-viewer {
             width: 100%;
             height: 100vh;
             background-color: transparent; /* Прозрачный фон */
         }
+
+        /* Стили для кнопки AR */
         .ar-button {
             position: absolute;
             bottom: 20px;
@@ -26,6 +30,7 @@
     </style>
 </head>
 <body>
+
     <model-viewer 
         id="modelViewer"
         src="prised2.glb" 
@@ -38,11 +43,10 @@
         xr-environment 
         ar-placement="floor" 
         ar-scale="auto" 
-        animation-name="YourAnimationName" 
-        autoplay>
+        animation-name="" 
+        autoplay="">
     </model-viewer>
 
-    <!-- Кнопка для активации AR -->
     <button id="arButton" class="ar-button">
         Включить AR
     </button>
@@ -62,20 +66,33 @@
         // Активация AR при нажатии на кнопку
         arButton.addEventListener('click', () => {
             if (modelViewer.canActivateAR) {
-                modelViewer.activateAR().catch((error) => {
-                    console.error('Ошибка при активации AR:', error);
-                });
+                activateARWithDelay();
             } else {
                 alert('AR не поддерживается на этом устройстве.');
             }
         });
 
+        // Функция для активации AR с задержкой
+        function activateARWithDelay() {
+            modelViewer.activateAR().catch((error) => {
+                console.error('Ошибка при активации AR:', error);
+            });
+
+            // Задержка перед повторным размещением модели
+            setTimeout(() => {
+                try {
+                    modelViewer.jumpToPosition(); // Перемещает модель на новую поверхность
+                    console.log('Модель перемещена на новую поверхность.');
+                } catch (error) {
+                    console.error('Ошибка при перемещении модели:', error);
+                }
+            }, 2000); // Задержка 2 секунды
+        }
+
         // Автоматическая активация AR при загрузке страницы (опционально)
         window.addEventListener('load', () => {
             if (modelViewer.canActivateAR) {
-                modelViewer.activateAR().catch((error) => {
-                    console.error('Ошибка при автоматической активации AR:', error);
-                });
+                activateARWithDelay();
             }
         });
     </script>
